@@ -9,6 +9,9 @@ import (
 	"github.com/andybalholm/cascadia"
 
 	"golang.org/x/net/html"
+
+	"google.golang.org/appengine"
+	"google.golang.org/appengine/urlfetch"
 )
 
 // Document represents an HTML document to be manipulated. Unlike jQuery, which
@@ -31,9 +34,11 @@ func NewDocumentFromNode(root *html.Node) *Document {
 // NewDocument is a Document constructor that takes a string URL as argument.
 // It loads the specified document, parses it, and stores the root Document
 // node, ready to be manipulated.
-func NewDocument(url string) (*Document, error) {
+func NewDocument(url string, r *http.Request) (*Document, error) {
+	ctx := appengine.NewContext(r)
+	client := urlfetch.Client(ctx)
 	// Load the URL
-	res, e := http.Get(url)
+	res, e := client.Get(url)
 	if e != nil {
 		return nil, e
 	}
